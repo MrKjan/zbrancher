@@ -1,4 +1,4 @@
-# branch_name_former
+# Zbrancher
 Задача:
 
 https://jira.company.com/jira/browse/TASK-11111, ‘Bug description’ => ‘feature/PROJECT_PREFIX/TASK-11111_Bug_description’
