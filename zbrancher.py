@@ -3,7 +3,6 @@
 # Example input:  'https://jira.company.com/jira/browse/TASK-11111' 'Bug description'
 # Example output: 'feature/PROJECT_PREFIX/TASK-11111_Bug_description'
 
-import sys
 import configparser
 import argparse
 
@@ -45,8 +44,17 @@ if __name__ == '__main__':
     task_prefix = names['task_prefix']
     project = names['project_prefix']
     type = names['branch_type']
+    if vars(args)['b']:
+        type = names['branch_type_bug']
+
 
     task_format = settings['task_format']
+    if vars(args)['l']:
+        task_format = 'link'
+    if vars(args)['n']:
+        task_format = 'number'
+    if vars(args)['r']:
+        task_format = 'raw'
 
     task = vars(args)['task']
     description = vars(args)['description']
