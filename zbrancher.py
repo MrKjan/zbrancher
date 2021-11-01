@@ -5,6 +5,7 @@
 
 import sys
 import configparser
+import argparse
 
 names = {
     "task_prefix": "TASK",
@@ -20,6 +21,23 @@ settings = {
 if __name__ == '__main__':
     config = configparser.ConfigParser()
     config.read('config.ini')
+    parser = argparse.ArgumentParser(description='''
+        Makes name of a git branch out of Jira task and its description.
+        "zbrancher 'https://jira.company.com/jira/browse/TASK-11111' 'Bug description'"
+        should produce
+        "feature/PROJECT_PREFIX/TASK-11111_Bug_description"
+        if config file is default
+        ''')
+    parser.add_argument('-b', action='store_true',
+        help='if set, bug prefix will be written instead of default')
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument('-l', action='store_true',
+        help='task format should be: "https://jira.company.com/jira/browse/TASK-12345"')
+    group.add_argument('-n', action='store_true', help='task format should be: "12345"')
+    group.add_argument('-r', action='store_true', help='task format should be: "TASK-12345"')
+    parser.add_argument('task')
+    parser.add_argument('description')
+    args = parser.parse_args()
 
     names = {**names, **config['NAMES']}
     settings = {**settings, **config['SETTINGS']}
@@ -28,19 +46,14 @@ if __name__ == '__main__':
     project = names['project_prefix']
     type = names['branch_type']
 
-    cnt_args = len(sys.argv)
-    if cnt_args < 3:
-        print(f"Not enough arguments. Expected: 2, found: {cnt_args - 1}")
-        exit()
-    if cnt_args > 3:
-        print(f"Too much arguments. Last {cnt_args- 3} arguments will be ignored")
+    task_format = settings['task_format']
 
-    task = sys.argv[1]
-    description = sys.argv[2]
+    task = vars(args)['task']
+    description = vars(args)['description']
 
-    if settings["task_format"] == 'link':
+    if task_format == 'link':
         task = task.split('/')[-1]
-    elif settings["task_format"] == 'number':
+    elif task_format == 'number':
         task = f"{task_prefix}_{task}"
 
     description = description.replace(' ', '_')
